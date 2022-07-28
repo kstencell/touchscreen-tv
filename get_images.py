@@ -1,9 +1,16 @@
 from ffmpy import FFmpeg
 import os
 
-ff = FFmpeg(
-        inputs={'http://10.193.1.119:5002/video': ['-f', 'mjpeg']},
-        outputs={'img.jpg': ['-vf', 'fps=60']}
-    )
+def FFmpegImageCapture(name, ip):
 
-os.system(ff.cmd)
+    print("Thread: {} is starting".format(name))
+
+    # ff = FFmpeg(
+    #         inputs={'http://{}/video'.format(ip): ['-f', 'mjpeg']},
+    #         outputs={'img.jpg': ['-vf', 'fps=60']}
+    #     )
+
+    # os.system(ff.cmd)
+
+    while(True):
+        pass

@@ -1,4 +1,3 @@
-# from typing import final
 import cv2
 import numpy as np
 import math
@@ -108,17 +107,17 @@ def TransformToRectangle(intersections, points_on_screen):
     data = np.asarray(points_on_screen)
     data_local = t(data)
 
-    plt.figure()
-    plt.plot(src[[0,1,2,3,0], 0], src[[0,1,2,3,0], 1], '-')
-    plt.plot(data.T[0], data.T[1], 'o')
-    plt.gca().invert_yaxis()
-    plt.margins(0)
-    plt.figure()
-    plt.plot(dst.T[0], dst.T[1], '-')
-    plt.plot(data_local.T[0], data_local.T[1], 'o')
-    plt.gca().set_aspect('equal', adjustable='box')
-    plt.margins(0)
-    plt.show()
+    # plt.figure()
+    # plt.plot(src[[0,1,2,3,0], 0], src[[0,1,2,3,0], 1], '-')
+    # plt.plot(data.T[0], data.T[1], 'o')
+    # plt.gca().invert_yaxis()
+    # plt.margins(0)
+    # plt.figure()
+    # plt.plot(dst.T[0], dst.T[1], '-')
+    # plt.plot(data_local.T[0], data_local.T[1], 'o')
+    # plt.gca().set_aspect('equal', adjustable='box')
+    # plt.margins(0)
+    # plt.show()
 
     return data_local
 
@@ -138,7 +137,7 @@ def TransformToRectangle_Contour(tv_corners, points_on_screen):
     data_local = t(data)
 
     ### UNCOMMENT TO SHOW ORIGINAL POINTS AND TRANSFORMED POINTS COMPARISON
-    ShowTransform(src, dst, data, data_local)
+    # ShowTransform(src, dst, data, data_local)
 
     return data_local
 

@@ -1,52 +1,60 @@
 import cv2
-import numpy as np
-import math
-from skimage.transform import ProjectiveTransform
-import matplotlib.pyplot as plt
+import time
 from process_image_library import *
+import globals
 
-# Load image
-# image = cv2.imread('200_test_with_points.jpg')
-image = cv2.imread('200_test_with_arm_and_pointer.jpg')
-cv2.imshow("Original", image)
+def ProcessImages(thread_num=0, index=0):
 
-### DELETE EVERYTHING THAT'S NOT RED IN ORIGINAL IMAGE AND CONVERT TO BLACK/WHITE
-image_copy = image.copy()
-only_red_binary = RedMaskAndBinary(image_copy)
-cv2.imshow("Only Red Binary", only_red_binary)
+    while(True):
+        try:
+            # Load image
+            # image = cv2.imread('200_test_with_points.jpg')
+            # image = cv2.imread('200_test_with_arm_and_pointer.jpg')
+            image = cv2.imread('img.jpg')
+            image_copy = image.copy()
 
-#### GET AVERAGE LINE ON ALL FOUR SIDES ####
-lines = GetAverageLines(only_red_binary)
+            # cv2.imshow("Original: thread {}".format(thread_num), image)
 
-#### CALCULATE INTERSECTIONS OF LINES #####
-intersections = GetIntersections(lines)
+            ### DELETE EVERYTHING THAT'S NOT RED IN ORIGINAL IMAGE AND CONVERT TO BLACK/WHITE
+            only_red_binary = RedMaskAndBinary(image_copy)
+            # cv2.imshow("Only Red Binary", only_red_binary)
 
-#### SHOW WHAT COMPUTER SEES ####
-canvas = DrawOnCanvas(intersections, lines)
-cv2.imshow("Computer Vision", canvas)
+            #### GET AVERAGE LINE ON ALL FOUR SIDES ####
+            lines = GetAverageLines(only_red_binary)
 
-### FIND LARGEST CONTOUR (SHOULD BE TV OUTLINE) USED FOR DETERMINING IF DOTS ARE ON SCREEN OR OFF SCREEN
-contour = GetLargestContour(only_red_binary)
+            #### CALCULATE INTERSECTIONS OF LINES #####
+            intersections = GetIntersections(lines)
 
-### APPROXIMATE CONVEX HULL FROM BROKEN QUADRILATERAL CONTOUR
-hull = cv2.convexHull(contour)
+            #### SHOW WHAT COMPUTER SEES ####
+            # canvas = DrawOnCanvas(intersections, lines)
+            # cv2.imshow("Computer Vision", canvas)
 
-### DETECT ALL WHITE DOTS IN IMAGE
-all_dots = DotDetector(only_red_binary)
+            ### FIND LARGEST CONTOUR (SHOULD BE TV OUTLINE) USED FOR DETERMINING IF DOTS ARE ON SCREEN OR OFF SCREEN
+            contour = GetLargestContour(only_red_binary)
 
-### GET ONLY POINTS THAT ARE INSIDE SCREEN CONTOUR (CENTER OF DOTS SPECIFICALLY)
-points_on_screen = GetPointsInsideContour(all_dots, hull)
+            ### APPROXIMATE CONVEX HULL FROM BROKEN QUADRILATERAL CONTOUR
+            hull = cv2.convexHull(contour)
 
-# VisualizePointsOnScreen(points_on_screen, image.copy())
+            ### DETECT ALL WHITE DOTS IN IMAGE
+            all_dots = DotDetector(only_red_binary)
 
-### TRANSFORM QUADRILATERAL PLANE TO RECTANGLE (TV) AND USE TRANSFORM ON POINTS
-transformed_point = TransformToRectangle(intersections, points_on_screen)[0]
+            ### GET ONLY POINTS THAT ARE INSIDE SCREEN CONTOUR (CENTER OF DOTS SPECIFICALLY)
+            points_on_screen = GetPointsInsideContour(all_dots, hull)
 
-# print(transformed_point[0])
+            # VisualizePointsOnScreen(points_on_screen, image.copy())
 
-f = open("camera1.txt", "a")
-f.write(str(transformed_point[0]))
-f.close()
+            ### TRANSFORM QUADRILATERAL PLANE TO RECTANGLE (TV) AND USE TRANSFORM ON POINTS
+            transformed_point = TransformToRectangle(intersections, points_on_screen)[0]
 
-cv2.waitKey(0)
-# cv2.destroyAllWindows()
+            globals.points_from_cameras[index] = transformed_point
+
+            # cv2.waitKey(0)
+            # cv2.destroyAllWindows()
+
+            print("Thread {} processed an image".format(thread_num), flush=True)
+        except:
+            print("error")
+
+
+if __name__ == "__main__":
+    ProcessImages()
