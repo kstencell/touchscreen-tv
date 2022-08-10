@@ -41,6 +41,7 @@ def GetLargestContour(image):
     ## FIND LARGEST CONTOUR (SHOULD BE TV OUTLINE)
     sorted_contours= sorted(contours, key=cv2.contourArea, reverse=True)
     largest_contour = sorted_contours[0]
+    print("Largest contour: ", largest_contour)
     return largest_contour
 
 def ScaleContour(cnt, scale):
@@ -58,7 +59,9 @@ def ScaleContour(cnt, scale):
 
 def DotDetector(image):
 
-    # blur = cv2.GaussianBlur(image,(5,5),0)
+    blur = cv2.GaussianBlur(image,(9,9), cv2.BORDER_DEFAULT)
+    cv2.imshow("Blur", blur)
+
     # retval, threshold = cv2.threshold(blur, 200, 255, cv2.THRESH_BINARY_INV)
     
     # Create detector with parameters for white dots
@@ -69,28 +72,28 @@ def DotDetector(image):
 
     # # Filter by Area.
     params.filterByArea = True
-    params.minArea = 0
-    params.maxArea = 150
+    params.minArea = 10
+    params.maxArea = 10000
 
     # # Filter by Circularity
     params.filterByCircularity = True
-    params.minCircularity = 0
+    params.minCircularity = 0.7
 
     # # # Filter by Convexity
-    params.filterByConvexity = True
+    params.filterByConvexity = False
     params.minConvexity = 0
 
     # # Filter by Inertia
-    params.filterByInertia = True
+    params.filterByInertia = False
     params.minInertiaRatio = 0
 
     detector = cv2.SimpleBlobDetector_create(params)
     print(params.maxConvexity)
 
     # Detect blobs.
-    keypoints = detector.detect(image)
+    keypoints = detector.detect(blur)
 
-    blobs = cv2.drawKeypoints(image, keypoints, image, (0, 0, 255),cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    blobs = cv2.drawKeypoints(blur, keypoints, image, (0, 0, 255),cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
     cv2.imshow("Blobs Using Area", blobs)
 

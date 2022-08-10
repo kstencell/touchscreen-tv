@@ -92,10 +92,15 @@ def ProcessTestImages(thread_num=0, index=0, name="null"):
     # cv2.imshow("Computer Vision", canvas)
 
     ### FIND LARGEST CONTOUR (SHOULD BE TV OUTLINE) USED FOR DETERMINING IF DOTS ARE ON SCREEN OR OFF SCREEN
-    contour = GetLargestContour(only_red_binary)
+    contour = GetLargestContour(canvas)
+    scaled_contour = ScaleContour(contour, 0.95)
+    contour_image = cv2.drawContours(image, [scaled_contour], -1, (255, 0, 0), 2)
+    # cv2.imshow("Contour", contour_image)
 
     ### APPROXIMATE CONVEX HULL FROM BROKEN QUADRILATERAL CONTOUR
     hull = cv2.convexHull(contour)
+    hull_image = cv2.drawContours(image, [hull], -1, (255, 0, 0), 2)
+    cv2.imshow("Hull", hull_image)
 
     ### DETECT ALL WHITE DOTS IN IMAGE
     all_dots = DotDetector(only_red_binary)
@@ -105,9 +110,9 @@ def ProcessTestImages(thread_num=0, index=0, name="null"):
     ### GET ONLY POINTS THAT ARE INSIDE SCREEN CONTOUR (CENTER OF DOTS SPECIFICALLY)
     points_on_screen = GetPointsInsideContour(all_dots, hull)
 
-    # print(points_on_screen)
+    print("Points on screen:", points_on_screen)
 
-    # VisualizePointsOnScreen(points_on_screen, canvas.copy())
+    VisualizePointsOnScreen(points_on_screen, canvas.copy())
 
     # ### TRANSFORM QUADRILATERAL PLANE TO RECTANGLE (TV) AND USE TRANSFORM ON POINTS
     # transformed_point = TransformToRectangle(intersections, points_on_screen)[0]

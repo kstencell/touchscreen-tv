@@ -5,8 +5,8 @@ import cv2
 # ProcessTestImages(name='200_test_with_arm_and_pointer')
 # ProcessTestImages(name='test_center/camera2')
 
-# ProcessTestImages(name='test_bottom_left/camera1')
-ProcessTestImages(name='test_bottom_left/camera2')
+ProcessTestImages(name='test_bottom_left/camera1')
+# ProcessTestImages(name='test_bottom_left/camera2')
 
 # ProcessTestImages(name='test_bottom_right/camera1')
 # ProcessTestImages(name='test_bottom_right/camera2')
