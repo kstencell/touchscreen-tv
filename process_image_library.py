@@ -58,47 +58,41 @@ def ScaleContour(cnt, scale):
 
 def DotDetector(image):
 
-    blur = cv2.GaussianBlur(image,(5,5),0)
-    retval, threshold = cv2.threshold(blur, 200, 255, cv2.THRESH_BINARY_INV)
+    # blur = cv2.GaussianBlur(image,(5,5),0)
+    # retval, threshold = cv2.threshold(blur, 200, 255, cv2.THRESH_BINARY_INV)
     
     # Create detector with parameters for white dots
     params = cv2.SimpleBlobDetector_Params()
 
-    # Change thresholds
-    params.minThreshold = 10
-    params.maxThreshold = 200
+    params.filterByColor = True
+    params.blobColor = 255
 
-    # params.filterByColor = True
-    # params.blobColor = 255
-
-    # Filter by Area.
+    # # Filter by Area.
     params.filterByArea = True
-    params.minArea = 100
-    params.maxArea = 10000000
+    params.minArea = 0
+    params.maxArea = 150
 
-    # Filter by Circularity
-    params.filterByCircularity = False
+    # # Filter by Circularity
+    params.filterByCircularity = True
     params.minCircularity = 0
 
-    # Filter by Convexity
-    params.filterByConvexity = False
+    # # # Filter by Convexity
+    params.filterByConvexity = True
     params.minConvexity = 0
 
-    # Filter by Inertia
-    params.filterByInertia = False
+    # # Filter by Inertia
+    params.filterByInertia = True
     params.minInertiaRatio = 0
-
-    # Filter by Convexity
-    params.filterByConvexity = False
-    params.minConvexity = 0
 
     detector = cv2.SimpleBlobDetector_create(params)
     print(params.maxConvexity)
 
-    cv2.imshow("DotDetector Image", threshold)
-
     # Detect blobs.
     keypoints = detector.detect(image)
+
+    blobs = cv2.drawKeypoints(image, keypoints, image, (0, 0, 255),cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+    cv2.imshow("Blobs Using Area", blobs)
 
     return keypoints
 

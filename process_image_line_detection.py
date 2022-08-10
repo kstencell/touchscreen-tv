@@ -69,7 +69,8 @@ def ProcessTestImages(thread_num=0, index=0, name="null"):
     # Load image
     # image = cv2.imread('200_test_with_arm_and_pointer.jpg')
     image = cv2.imread(f'./images/{name}.jpg')
-    print(f'./images/{name}.jpg')
+    # cv2.imshow("Original", image)
+
     # image = cv2.imread('./images/testing_images/{}/img.jpg'.format(name))
     # image = cv2.imread(latest_file)
     image_copy = image.copy()
@@ -78,7 +79,7 @@ def ProcessTestImages(thread_num=0, index=0, name="null"):
 
     ### DELETE EVERYTHING THAT'S NOT RED IN ORIGINAL IMAGE AND CONVERT TO BLACK/WHITE
     only_red_binary = RedMaskAndBinary(image_copy)
-    cv2.imshow("Only Red Binary", only_red_binary)
+    # cv2.imshow("Only Red Binary", only_red_binary)
 
     #### GET AVERAGE LINE ON ALL FOUR SIDES ####
     lines = GetAverageLines(only_red_binary)
@@ -106,7 +107,7 @@ def ProcessTestImages(thread_num=0, index=0, name="null"):
 
     # print(points_on_screen)
 
-    VisualizePointsOnScreen(points_on_screen, canvas.copy())
+    # VisualizePointsOnScreen(points_on_screen, canvas.copy())
 
     # ### TRANSFORM QUADRILATERAL PLANE TO RECTANGLE (TV) AND USE TRANSFORM ON POINTS
     # transformed_point = TransformToRectangle(intersections, points_on_screen)[0]
@@ -116,9 +117,6 @@ def ProcessTestImages(thread_num=0, index=0, name="null"):
     # f = open(f"test_output_points/{name}.txt", "a")
     # f.write(transformed_point)
     # f.close()
-
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     ProcessImages()
