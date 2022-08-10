@@ -57,11 +57,45 @@ def ScaleContour(cnt, scale):
 
 
 def DotDetector(image):
+
+    blur = cv2.GaussianBlur(image,(5,5),0)
+    retval, threshold = cv2.threshold(blur, 200, 255, cv2.THRESH_BINARY_INV)
+    
     # Create detector with parameters for white dots
     params = cv2.SimpleBlobDetector_Params()
-    params.filterByColor = True
-    params.blobColor = 255
+
+    # Change thresholds
+    params.minThreshold = 10
+    params.maxThreshold = 200
+
+    # params.filterByColor = True
+    # params.blobColor = 255
+
+    # Filter by Area.
+    params.filterByArea = True
+    params.minArea = 100
+    params.maxArea = 10000000
+
+    # Filter by Circularity
+    params.filterByCircularity = False
+    params.minCircularity = 0
+
+    # Filter by Convexity
+    params.filterByConvexity = False
+    params.minConvexity = 0
+
+    # Filter by Inertia
+    params.filterByInertia = False
+    params.minInertiaRatio = 0
+
+    # Filter by Convexity
+    params.filterByConvexity = False
+    params.minConvexity = 0
+
     detector = cv2.SimpleBlobDetector_create(params)
+    print(params.maxConvexity)
+
+    cv2.imshow("DotDetector Image", threshold)
 
     # Detect blobs.
     keypoints = detector.detect(image)
@@ -107,17 +141,17 @@ def TransformToRectangle(intersections, points_on_screen):
     data = np.asarray(points_on_screen)
     data_local = t(data)
 
-    # plt.figure()
-    # plt.plot(src[[0,1,2,3,0], 0], src[[0,1,2,3,0], 1], '-')
-    # plt.plot(data.T[0], data.T[1], 'o')
-    # plt.gca().invert_yaxis()
-    # plt.margins(0)
-    # plt.figure()
-    # plt.plot(dst.T[0], dst.T[1], '-')
-    # plt.plot(data_local.T[0], data_local.T[1], 'o')
-    # plt.gca().set_aspect('equal', adjustable='box')
-    # plt.margins(0)
-    # plt.show()
+    plt.figure()
+    plt.plot(src[[0,1,2,3,0], 0], src[[0,1,2,3,0], 1], '-')
+    plt.plot(data.T[0], data.T[1], 'o')
+    plt.gca().invert_yaxis()
+    plt.margins(0)
+    plt.figure()
+    plt.plot(dst.T[0], dst.T[1], '-')
+    plt.plot(data_local.T[0], data_local.T[1], 'o')
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.margins(0)
+    plt.show()
 
     return data_local
 
@@ -137,7 +171,7 @@ def TransformToRectangle_Contour(tv_corners, points_on_screen):
     data_local = t(data)
 
     ### UNCOMMENT TO SHOW ORIGINAL POINTS AND TRANSFORMED POINTS COMPARISON
-    # ShowTransform(src, dst, data, data_local)
+    ShowTransform(src, dst, data, data_local)
 
     return data_local
 
@@ -176,7 +210,7 @@ def VisualizeContourCorners(corners, image):
 
 def VisualizePointsOnScreen(points_on_screen, image):
     for point in points_on_screen:
-        image = cv2.circle(image, (point[0], point[1]), radius=1, color=(255, 0, 0), thickness=-1)
+        image = cv2.circle(image, (point[0], point[1]), radius=5, color=(255, 0, 0), thickness=-1)
     cv2.imshow("Points on screen", image)
 
 
@@ -210,12 +244,14 @@ def segmented_intersections(lines):
         for y in lines[k+1:]:
             intersections.append(intersection(x, y))
 
+    # print(intersections)
     return intersections
 
 def GetAverageLines(image):
     ### GET LINES FROM IMAGE ###
     edges = cv2.Canny(image, 100, 100)
-    lines = cv2.HoughLines(edges, 1.5, np.pi / 180, 150, None, 0, 0)
+    # lines = cv2.HoughLines(edges, 1.5, np.pi / 180, 150, None, 0, 0)
+    lines = cv2.HoughLines(edges, 1, np.pi / 180, 50, None, 0, 0)
 
     #### Categorize lines by sides ####
     lineCollections = CategorizeLines(lines)
@@ -237,14 +273,36 @@ def CategorizeLines(lines):
     for line in lines:
         rho_l, theta_l = line[0]
 
-        if (np.pi/5 <= theta_l <= np.pi/3):
+        if (0 <= theta_l <= 1):
             left_lines.append(line)
-        elif (np.pi*(2/3) <= theta_l <= np.pi*(6/5)):
+        elif (2 <= theta_l <= 3):
             right_lines.append(line)
         elif (rho_l > 300):
             bottom_lines.append(line)
         elif (rho_l < 100):
             top_lines.append(line)
+    
+    # line_guessing = []
+    # for line in lines:
+    #     rho_1, theta_1 = line[0]
+    #     print(theta_1)
+    #     if (2 <= theta_1 <= 3):
+    #         line_guessing.append(line)
+
+    # canvas = DrawOnCanvas(0, line_guessing)
+    # cv2.imshow("guessing lines", canvas)
+    
+    # canvas = DrawOnCanvas(0, left_lines)
+    # cv2.imshow("left lines", canvas)
+
+    # canvas = DrawOnCanvas(0, right_lines)
+    # cv2.imshow("right lines", canvas)
+
+    # canvas = DrawOnCanvas(0, top_lines)
+    # cv2.imshow("top lines", canvas)
+
+    # canvas = DrawOnCanvas(0, bottom_lines)
+    # cv2.imshow("bottom lines", canvas)
 
     #### Put line lists into a single array to make the following for loop easier ####
     lineCollections = []
@@ -252,6 +310,15 @@ def CategorizeLines(lines):
     lineCollections.append(right_lines)
     lineCollections.append(top_lines)
     lineCollections.append(bottom_lines)
+
+    # print("\n****************left line collection**********\n")
+    # print(left_lines)
+    # print("\n****************right line collection**********\n")
+    # print(right_lines)
+    # print("\n****************top line collection**********\n")
+    # print(top_lines)
+    # print("\n****************bottom line collection**********\n")
+    # print(bottom_lines)
 
     return lineCollections
 
@@ -268,9 +335,12 @@ def GetIntersections(lines):
         if (abs(point[0][0]) > abs(largest_x_point[0][0])):
             largest_x_point = point
             largest_x_index = k
-        elif (abs(point[0][1]) < abs(smallest_y_point[0][1])):
+        if (point[0][1] < 0):
             smallest_y_point = point
             smallest_y_index = k
+        # elif (abs(point[0][1]) < abs(smallest_y_point[0][1])):
+        #     smallest_y_point = point
+        #     smallest_y_index = k
 
     intersections.pop(largest_x_index)
     intersections.pop(smallest_y_index)
@@ -279,14 +349,12 @@ def GetIntersections(lines):
 
 def DrawOnCanvas(intersections, lines):
     #### BLANK CANVAS TO DRAW RESULTS ON ####
-    canvas =  np.zeros((480, 640, 3), dtype=np.uint8)
+    canvas =  np.zeros((480, 720, 3), dtype=np.uint8)
 
     #### DRAW INTERSECTION POINTS ONTO CANVAS
-    # color = 100
-    # for point in intersections:
-    #     print(point[0])
-    #     cv2.circle(canvas, point[0], radius=10, color=(0, 0, color), thickness=-1)
-    #     color += 50
+    for point in intersections:
+        print(point[0])
+        cv2.circle(canvas, point[0], radius=10, color=(0, 0, 255), thickness=-1)
     
     #### DRAW LINES ON BLACK CANVAS ####
     for line in lines:

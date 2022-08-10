@@ -69,4 +69,4 @@ def MoveMouse():
             pyautogui.moveTo(pointX, pointY)
             print(f"Moved mouse to ({pointX}, {pointY})")
         
-        time.sleep(0.001)
+        time.sleep(1)

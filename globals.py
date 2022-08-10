@@ -1,1 +1,1 @@
-points_from_cameras = [[1.45,1.45],[1.5,1.5]]
+points_from_cameras = [[0,0],[0,0]]
