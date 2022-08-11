@@ -3,6 +3,7 @@ import numpy as np
 import math
 from skimage.transform import ProjectiveTransform
 import matplotlib.pyplot as plt
+from scipy.spatial import ConvexHull
 
 def RedMaskAndBinary(image):
     ### TARGET RED BORDER OF TV ####
@@ -36,12 +37,11 @@ def RedMaskAndBinary(image):
 
 def GetLargestContour(image):
     ## DETECT CONTOURS
-    contours, hierarchy= cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+    contours, hierarchy= cv2.findContours(image, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
 
     ## FIND LARGEST CONTOUR (SHOULD BE TV OUTLINE)
     sorted_contours= sorted(contours, key=cv2.contourArea, reverse=True)
     largest_contour = sorted_contours[0]
-    print("Largest contour: ", largest_contour)
     return largest_contour
 
 def ScaleContour(cnt, scale):
@@ -60,7 +60,7 @@ def ScaleContour(cnt, scale):
 def DotDetector(image):
 
     blur = cv2.GaussianBlur(image,(9,9), cv2.BORDER_DEFAULT)
-    cv2.imshow("Blur", blur)
+    # cv2.imshow("Blur", blur)
 
     # retval, threshold = cv2.threshold(blur, 200, 255, cv2.THRESH_BINARY_INV)
     
@@ -88,14 +88,13 @@ def DotDetector(image):
     params.minInertiaRatio = 0
 
     detector = cv2.SimpleBlobDetector_create(params)
-    print(params.maxConvexity)
 
     # Detect blobs.
     keypoints = detector.detect(blur)
 
     blobs = cv2.drawKeypoints(blur, keypoints, image, (0, 0, 255),cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-    cv2.imshow("Blobs Using Area", blobs)
+    # cv2.imshow("Blobs Using Area", blobs)
 
     return keypoints
 
@@ -104,10 +103,9 @@ def GetPointsInsideContour(keypoints, contour):
     points_on_screen = []
     for point in keypoints:
         coords = (round(point.pt[0]), round(point.pt[1]))
-        # print("x: ", coords[0], " y: ", coords[1])
         if cv2.pointPolygonTest(contour, coords, False) == 1:
             points_on_screen.append(coords)
-    
+
     return points_on_screen
 
 
@@ -241,7 +239,6 @@ def segmented_intersections(lines):
         for y in lines[k+1:]:
             intersections.append(intersection(x, y))
 
-    # print(intersections)
     return intersections
 
 def GetAverageLines(image):
@@ -278,28 +275,6 @@ def CategorizeLines(lines):
             bottom_lines.append(line)
         elif (rho_l < 100):
             top_lines.append(line)
-    
-    # line_guessing = []
-    # for line in lines:
-    #     rho_1, theta_1 = line[0]
-    #     print(theta_1)
-    #     if (2 <= theta_1 <= 3):
-    #         line_guessing.append(line)
-
-    # canvas = DrawOnCanvas(0, line_guessing)
-    # cv2.imshow("guessing lines", canvas)
-    
-    # canvas = DrawOnCanvas(0, left_lines)
-    # cv2.imshow("left lines", canvas)
-
-    # canvas = DrawOnCanvas(0, right_lines)
-    # cv2.imshow("right lines", canvas)
-
-    # canvas = DrawOnCanvas(0, top_lines)
-    # cv2.imshow("top lines", canvas)
-
-    # canvas = DrawOnCanvas(0, bottom_lines)
-    # cv2.imshow("bottom lines", canvas)
 
     #### Put line lists into a single array to make the following for loop easier ####
     lineCollections = []
@@ -307,15 +282,6 @@ def CategorizeLines(lines):
     lineCollections.append(right_lines)
     lineCollections.append(top_lines)
     lineCollections.append(bottom_lines)
-
-    # print("\n****************left line collection**********\n")
-    # print(left_lines)
-    # print("\n****************right line collection**********\n")
-    # print(right_lines)
-    # print("\n****************top line collection**********\n")
-    # print(top_lines)
-    # print("\n****************bottom line collection**********\n")
-    # print(bottom_lines)
 
     return lineCollections
 
@@ -349,20 +315,24 @@ def DrawOnCanvas(intersections, lines):
     canvas =  np.zeros((480, 720, 3), dtype=np.uint8)
 
     #### DRAW INTERSECTION POINTS ONTO CANVAS
-    for point in intersections:
-        print(point[0])
-        cv2.circle(canvas, point[0], radius=10, color=(0, 0, 255), thickness=-1)
-    
+    # for point in intersections:
+    #     cv2.circle(canvas, point[0], radius=10, color=(0, 0, 255), thickness=-1)
+
+    #### DRAW LINES BETWEEN INTERSECTION POINTS #####
+    simplified_intersections = [intersections[0][0], intersections[2][0], intersections[3][0], intersections[1][0]]
+    simplified_intersections = np.array(simplified_intersections)
+    cv2.drawContours(canvas, [simplified_intersections], 0, (255,255,255), 2)
+
     #### DRAW LINES ON BLACK CANVAS ####
-    for line in lines:
-        rho_l, theta_l = line[0]
-        a_l = math.cos(theta_l)
-        b_l = math.sin(theta_l)
-        x0_l = a_l * rho_l
-        y0_l = b_l * rho_l
-        pt1_l = (int(x0_l + 1000*(-b_l)), int(y0_l + 1000*(a_l)))
-        pt2_l = (int(x0_l - 1000*(-b_l)), int(y0_l - 1000*(a_l)))
-        cv2.line(canvas, pt1_l, pt2_l, (255,255,255), 1, cv2.LINE_AA)
+    # for line in lines:
+    #     rho_l, theta_l = line[0]
+    #     a_l = math.cos(theta_l)
+    #     b_l = math.sin(theta_l)
+    #     x0_l = a_l * rho_l
+    #     y0_l = b_l * rho_l
+    #     pt1_l = (int(x0_l + 1000*(-b_l)), int(y0_l + 1000*(a_l)))
+    #     pt2_l = (int(x0_l - 1000*(-b_l)), int(y0_l - 1000*(a_l)))
+    #     cv2.line(canvas, pt1_l, pt2_l, (255,255,255), 1, cv2.LINE_AA)
 
     canvas = cv2.cvtColor(canvas, cv2.COLOR_BGR2GRAY)
     return canvas

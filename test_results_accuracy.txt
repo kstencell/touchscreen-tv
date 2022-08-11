@@ -1,0 +1,20 @@
+BOTTOM LEFT TEST IMAGE RESULTS
+
+Camera 1:
+x = 7.55 => 83.9% down from TOP edge
+y = 2.09 => 13% from LEFT edge
+
+Camera 2:
+x = 1.53 => 17% up from BOTTOM edge => 83% from TOP edge
+y = 14.32 => 89.5% from RIGHT edge => 10.5% from LEFT edge
+
+
+TOP RIGHT TEST IMAGE RESULTS
+
+Camera 1:
+x = 1.45 => 16.1% from TOP edge
+y = 14.72 => 92% from LEFT edge
+
+Camera 2:
+x = 7.61 => 84.5% from BOTTOM edge => 15.5% from TOP edge
+y = 1.58 => 9.9% from RIGHT edge => 90.1% from LEFT edge
