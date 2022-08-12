@@ -4,6 +4,7 @@ import math
 from skimage.transform import ProjectiveTransform
 import matplotlib.pyplot as plt
 from scipy.spatial import ConvexHull
+import globals
 
 def RedMaskAndBinary(image):
     ### TARGET RED BORDER OF TV ####
@@ -72,7 +73,7 @@ def DotDetector(image):
 
     # # Filter by Area.
     params.filterByArea = True
-    params.minArea = 10
+    params.minArea = 60
     params.maxArea = 10000
 
     # # Filter by Circularity
@@ -100,6 +101,7 @@ def DotDetector(image):
 
 
 def GetPointsInsideContour(keypoints, contour):
+    # print("keypoints: ", keypoints)
     points_on_screen = []
     for point in keypoints:
         coords = (round(point.pt[0]), round(point.pt[1]))
@@ -129,24 +131,36 @@ def TransformToRectangle(intersections, points_on_screen):
     t = ProjectiveTransform()
     #                [bottom_left, top_left, top_right, bottom_right])
     src = np.asarray([intersections[1][0], intersections[0][0], intersections[2][0], intersections[3][0]])
+    # print(src)
+    # print(intersections)
     ## standard 16:9 tv aspect ratio mapping (flipped horizontal because of image pov)
-    dst = np.asarray([[0, 0], [0, 16], [9, 16], [9, 0]])
+    # dst = np.asarray([[0, 0], [0, 16], [9, 16], [9, 0]])
+
+    # print("points on screen: ", points_on_screen)
+    #real aspect ratio of monitor
+    temp = [0, globals.aspect_ratio[0]]
+    # print(temp)
+    dst = np.asarray([[0, 0], [0, globals.aspect_ratio[0]], [globals.aspect_ratio[1], globals.aspect_ratio[0]], [globals.aspect_ratio[1], 0]])
+    
     if not t.estimate(src, dst): raise Exception("estimate failed")
 
     data = np.asarray(points_on_screen)
     data_local = t(data)
 
-    plt.figure()
-    plt.plot(src[[0,1,2,3,0], 0], src[[0,1,2,3,0], 1], '-')
-    plt.plot(data.T[0], data.T[1], 'o')
-    plt.gca().invert_yaxis()
-    plt.margins(0)
-    plt.figure()
-    plt.plot(dst.T[0], dst.T[1], '-')
-    plt.plot(data_local.T[0], data_local.T[1], 'o')
-    plt.gca().set_aspect('equal', adjustable='box')
-    plt.margins(0)
-    plt.show()
+    ### UNCOMMENT TO SHOW ORIGINAL POINTS AND TRANSFORMED POINTS COMPARISON
+    # ShowTransform(src, dst, data, data_local)
+
+    # plt.figure()
+    # plt.plot(src[[0,1,2,3,0], 0], src[[0,1,2,3,0], 1], '-')
+    # plt.plot(data.T[0], data.T[1], 'o')
+    # plt.gca().invert_yaxis()
+    # plt.margins(0)
+    # plt.figure()
+    # plt.plot(dst.T[0], dst.T[1], '-')
+    # plt.plot(data_local.T[0], data_local.T[1], 'o')
+    # plt.gca().set_aspect('equal', adjustable='box')
+    # plt.margins(0)
+    # plt.show()
 
     return data_local
 
@@ -166,7 +180,7 @@ def TransformToRectangle_Contour(tv_corners, points_on_screen):
     data_local = t(data)
 
     ### UNCOMMENT TO SHOW ORIGINAL POINTS AND TRANSFORMED POINTS COMPARISON
-    ShowTransform(src, dst, data, data_local)
+    # ShowTransform(src, dst, data, data_local)
 
     return data_local
 
@@ -201,12 +215,12 @@ def VisualizeContourCorners(corners, image):
             lineType)    
         num += 1
         image = cv2.circle(image, (corner[0], corner[1]), radius=1, color=(0, 255, 0), thickness=-1)
-    cv2.imshow('Corners', image)
+    # cv2.imshow('Corners', image)
 
 def VisualizePointsOnScreen(points_on_screen, image):
     for point in points_on_screen:
         image = cv2.circle(image, (point[0], point[1]), radius=5, color=(255, 0, 0), thickness=-1)
-    cv2.imshow("Points on screen", image)
+    # cv2.imshow("Points on screen", image)
 
 
 def VisualizeConvexHull(hull, image):

@@ -21,10 +21,10 @@ def FFmpegImageCapture(name, ip):
     for f in os.listdir(dir):
         os.remove(os.path.join(dir, f))
 
-    os.system(f"ffmpeg -f mjpeg -i http://{ip}/video -vf fps=5 ./images/testing_images/{name}/img%003d.jpg")
+    os.system(f"ffmpeg -f mjpeg -i http://{ip}:5000/video -vf fps=5 ./images/testing_images/{name}/img%003d.jpg")
 
     while(True):
         pass
 
 if __name__ == "__main__":
-    FFmpegImageCapture("camera1", "10.193.8.209:5001")
+    FFmpegImageCapture("camera1", "10.193.8.209:5000")

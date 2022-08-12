@@ -2,6 +2,7 @@ import pyautogui
 import ctypes
 import globals
 import time
+import math
 
 def calculate_aspect(width: int, height: int) -> str:
     temp = 0
@@ -28,29 +29,15 @@ def calculate_aspect(width: int, height: int) -> str:
 pyautogui.PAUSE = 0
 
 def MoveMouse():
-    #make variable for user32
-    user32 = ctypes.windll.user32
-
-    screensize = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
-    print(screensize)
-    # real aspect ratio! changed because my laptop is 3:2 not standard tv 16:9
-    # aspect_ratio = calculate_aspect(screensize[0], screensize[1])
-    aspect_ratio = (16,9)
-    print(f"Screen aspect ratio: {aspect_ratio}")
 
     while(True):
-        getX1 = globals.points_from_cameras[0][0] / aspect_ratio[0]
-        getY1 = globals.points_from_cameras[0][1] / aspect_ratio[1]
-
-        getX2 = globals.points_from_cameras[1][0] / aspect_ratio[0]
-        getY2 = globals.points_from_cameras[1][1] / aspect_ratio[1]
 
         #calculate the x and y position depending on pixels
-        xPositionCursor1 = getX1 * screensize[0]
-        yPositionCursor1 = getY1 * screensize[1]
+        xPositionCursor1 = globals.points_from_cameras[0][0] * globals.screensize[0] /100
+        yPositionCursor1 = globals.points_from_cameras[0][1] * globals.screensize[1] /100
 
-        xPositionCursor2 = getX2 * screensize[0]
-        yPositionCursor2 = getY2 * screensize[1]
+        xPositionCursor2 = globals.points_from_cameras[1][0] * globals.screensize[0] /100
+        yPositionCursor2 = globals.points_from_cameras[1][1] * globals.screensize[1] /100
 
         #typecast to int 
         xPositionCursor1 = int(xPositionCursor1)
@@ -62,11 +49,18 @@ def MoveMouse():
         # pyautogui.moveTo((xPositionCursor1 + xPositionCursor2)/2, (yPositionCursor1 + yPositionCursor2)/2)
 
         #set the mouse cursor to that point if within threshold distance from each other
-        if (abs(xPositionCursor1 - xPositionCursor2) < 0.1*screensize[0] and abs(yPositionCursor1 - yPositionCursor2) < 0.1*screensize[1]):
+        # if (abs(xPositionCursor1 - xPositionCursor2) < 0.1*globals.screensize[0] and abs(yPositionCursor1 - yPositionCursor2) < 0.1*globals.screensize[1]):
             # ctypes.windll.user32.SetCursorPos((xPositionCursor1 + xPositionCursor2)/2, (yPositionCursor1 + yPositionCursor2)/2)
-            pointX = (xPositionCursor1 + xPositionCursor2)/2
-            pointY = (yPositionCursor1 + yPositionCursor2)/2
+            # pointX = (xPositionCursor1 + xPositionCursor2)/2
+            # pointY = (yPositionCursor1 + yPositionCursor2)/2
+            # if ((globals.points_from_cameras[0][0] != 0 and globals.points_from_cameras[0][1] != 0) and (globals.points_from_cameras[1][0] != 0 and globals.points_from_cameras[1][1] != 0)):
+            #     pyautogui.moveTo(pointX, pointY)
+            #     print(f"Moved mouse to ({pointX}, {pointY})", flush=True)
+
+        pointX = (xPositionCursor1 + xPositionCursor2)/2
+        pointY = (yPositionCursor1 + yPositionCursor2)/2
+        if ((globals.points_from_cameras[0][0] != 0 and globals.points_from_cameras[0][1] != 0) and (globals.points_from_cameras[1][0] != 0 and globals.points_from_cameras[1][1] != 0)):
             pyautogui.moveTo(pointX, pointY)
-            print(f"Moved mouse to ({pointX}, {pointY})")
+            print(f"Moved mouse to ({pointX}, {pointY})", flush=True)
         
-        time.sleep(1)
+        # time.sleep(0.5)
