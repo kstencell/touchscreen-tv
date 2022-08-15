@@ -19,11 +19,11 @@ try:
 
 
     # left side of tv relative to user
-    camera1_thread = threading.Thread(target=gi.FFmpegImageCapture, args=("camera1", "10.193.1.206"), daemon=True)
+    camera1_thread = threading.Thread(target=gi.FFmpegImageCapture, args=("camera1", "10.193.1.24"), daemon=True)
     camera1_thread.start()
 
     # right side of tv relative to user
-    camera2_thread = threading.Thread(target=gi.FFmpegImageCapture, args=("camera2", "10.193.8.173"), daemon=True)
+    camera2_thread = threading.Thread(target=gi.FFmpegImageCapture, args=("camera2", "10.193.8.221"), daemon=True)
     camera2_thread.start()
 
     time.sleep(2)
@@ -40,8 +40,10 @@ try:
 except:
     print("Error: unable to start thread", flush=True)
 
+
+
 while 1:
     print("Thread count: {}".format(threading.active_count()), flush=True)
-    print("Point on screen from camera1: {}".format(globals.points_from_cameras[0]), flush=True)
-    print("Point on screen from camera2: {}".format(globals.points_from_cameras[1]), flush=True)
-    time.sleep(1)
+    # print("Point on screen from camera1: {}".format(globals.points_from_cameras[0]), flush=True)
+    # print("Point on screen from camera2: {}".format(globals.points_from_cameras[1]), flush=True)
+    time.sleep(5)

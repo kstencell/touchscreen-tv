@@ -95,7 +95,7 @@ def DotDetector(image):
 
     blobs = cv2.drawKeypoints(blur, keypoints, image, (0, 0, 255),cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-    # cv2.imshow("Blobs Using Area", blobs)
+    # cv2.imshow("Blobs", blobs)
 
     return keypoints
 

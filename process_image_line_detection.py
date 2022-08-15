@@ -9,6 +9,7 @@ import traceback
 def ProcessImages(thread_num=0, camera_num="null"):
 
     while(True):
+        time.sleep(0.05)
         try:
 
             # find most recent file
@@ -90,7 +91,8 @@ def ProcessTestImages(thread_num=0, index=0, directory="null", camera_num="null"
 
     # Load image
     # image = cv2.imread('200_test_with_arm_and_pointer.jpg')
-    image = cv2.imread(f'./images/{directory}/camera{camera_num}.jpg')
+    # image = cv2.imread(f'./images/{directory}/camera{camera_num}.jpg')
+    image = cv2.imread(f'./images/{directory}/pic1.jpg')
     cv2.imshow("Original", image)
 
     # image = cv2.imread('./images/testing_images/{}/img.jpg'.format(name))
@@ -110,7 +112,7 @@ def ProcessTestImages(thread_num=0, index=0, directory="null", camera_num="null"
 
     #### SHOW WHAT COMPUTER SEES ####
     canvas = DrawOnCanvas(intersections, lines)
-    # cv2.imshow("Computer Vision", canvas)
+    cv2.imshow("Computer Vision", canvas)
 
     ### FIND LARGEST CONTOUR (SHOULD BE TV OUTLINE) USED FOR DETERMINING IF DOTS ARE ON SCREEN OR OFF SCREEN
     contour = GetLargestContour(canvas)
@@ -146,6 +148,8 @@ def ProcessTestImages(thread_num=0, index=0, directory="null", camera_num="null"
         x = 100 - x
         y = 100 - y
 
+    # print(f'Camera{camera_num} coordinates: {y}, {x}\n')
+
     x = str(x)
     y = str(y)
 
@@ -155,15 +159,15 @@ def ProcessTestImages(thread_num=0, index=0, directory="null", camera_num="null"
     print("globals.points_from_cameras[camera_num-1][0]: ", globals.points_from_cameras[camera_num-1][0])
     print("globals.points_from_cameras[camera_num-1][1]: ", globals.points_from_cameras[camera_num-1][1])
 
-    try:
-        os.mkdir(f"./test_output_points/{directory}")
-    except Exception:
-        pass
+    # try:
+    #     os.mkdir(f"./test_output_points/{directory}")
+    # except Exception:
+    #     pass
 
-    f = open(f"./test_output_points/{directory}/camera{camera_num}.txt", "w+")
+    # f = open(f"./test_output_points/{directory}/camera{camera_num}.txt", "w+")
     ### FLIP X AND Y TO ALIGN WITH P.0.V OF USER
-    f.write(f"{y}, {x}")
-    f.close()
+    # f.write(f"{y}, {x}")
+    # f.close()
 
     # cv2.waitKey(0)
     # cv2.destroyAllWindows()
