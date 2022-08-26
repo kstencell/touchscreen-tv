@@ -16,5 +16,6 @@ def FFmpegImageCapture(name, ip):
         time.sleep(60000)
         pass
 
+
 if __name__ == "__main__":
     FFmpegImageCapture("camera1", "10.193.8.209:5000")

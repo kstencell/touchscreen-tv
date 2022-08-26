@@ -9,7 +9,7 @@ import traceback
 def ProcessImages(thread_num=0, camera_num="null"):
 
     while(True):
-        time.sleep(0.05)
+        time.sleep(0.01)
         try:
 
             # find most recent file
@@ -67,7 +67,7 @@ def ProcessImages(thread_num=0, camera_num="null"):
             y = round((transformed_point[1] / globals.aspect_ratio[0]) * 100, 2)
 
             ### FLIP PERCENTAGE FOR CAMERA 2 BECAUSE OF REVERSED P.0.V
-            if camera_num == 2:
+            if camera_num == 1:
                 x = 100 - x
                 y = 100 - y
 
@@ -92,7 +92,7 @@ def ProcessTestImages(thread_num=0, index=0, directory="null", camera_num="null"
     # Load image
     # image = cv2.imread('200_test_with_arm_and_pointer.jpg')
     # image = cv2.imread(f'./images/{directory}/camera{camera_num}.jpg')
-    image = cv2.imread(f'./images/{directory}/pic1.jpg')
+    image = cv2.imread(f'./images/{directory}.jpg')
     cv2.imshow("Original", image)
 
     # image = cv2.imread('./images/testing_images/{}/img.jpg'.format(name))

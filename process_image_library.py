@@ -95,7 +95,7 @@ def DotDetector(image):
 
     blobs = cv2.drawKeypoints(blur, keypoints, image, (0, 0, 255),cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-    # cv2.imshow("Blobs", blobs)
+    cv2.imshow("Blobs", blobs)
 
     return keypoints
 
@@ -147,20 +147,20 @@ def TransformToRectangle(intersections, points_on_screen):
     data = np.asarray(points_on_screen)
     data_local = t(data)
 
-    ### UNCOMMENT TO SHOW ORIGINAL POINTS AND TRANSFORMED POINTS COMPARISON
-    # ShowTransform(src, dst, data, data_local)
+    ## UNCOMMENT TO SHOW ORIGINAL POINTS AND TRANSFORMED POINTS COMPARISON
+    ShowTransform(src, dst, data, data_local)
 
-    # plt.figure()
-    # plt.plot(src[[0,1,2,3,0], 0], src[[0,1,2,3,0], 1], '-')
-    # plt.plot(data.T[0], data.T[1], 'o')
-    # plt.gca().invert_yaxis()
-    # plt.margins(0)
-    # plt.figure()
-    # plt.plot(dst.T[0], dst.T[1], '-')
-    # plt.plot(data_local.T[0], data_local.T[1], 'o')
-    # plt.gca().set_aspect('equal', adjustable='box')
-    # plt.margins(0)
-    # plt.show()
+    plt.figure()
+    plt.plot(src[[0,1,2,3,0], 0], src[[0,1,2,3,0], 1], '-')
+    plt.plot(data.T[0], data.T[1], 'o')
+    plt.gca().invert_yaxis()
+    plt.margins(0)
+    plt.figure()
+    plt.plot(dst.T[0], dst.T[1], '-')
+    plt.plot(data_local.T[0], data_local.T[1], 'o')
+    plt.gca().set_aspect('equal', adjustable='box')
+    plt.margins(0)
+    plt.show()
 
     return data_local
 
@@ -261,6 +261,23 @@ def GetAverageLines(image):
     # lines = cv2.HoughLines(edges, 1.5, np.pi / 180, 150, None, 0, 0)
     lines = cv2.HoughLines(edges, 1, np.pi / 180, 50, None, 0, 0)
 
+    ### DRAW ALL LINES ON BLACK CANVAS ####
+    canvas =  np.zeros((480, 720, 3), dtype=np.uint8)
+
+    for line in lines:
+        rho_l, theta_l = line[0]
+        a_l = math.cos(theta_l)
+        b_l = math.sin(theta_l)
+        x0_l = a_l * rho_l
+        y0_l = b_l * rho_l
+        pt1_l = (int(x0_l + 1000*(-b_l)), int(y0_l + 1000*(a_l)))
+        pt2_l = (int(x0_l - 1000*(-b_l)), int(y0_l - 1000*(a_l)))
+        cv2.line(canvas, pt1_l, pt2_l, (255,255,255), 1, cv2.LINE_AA)
+
+    canvas = cv2.cvtColor(canvas, cv2.COLOR_BGR2GRAY)
+    cv2.imshow("All lines", canvas)
+    # cv2.waitKey(0)
+
     #### Categorize lines by sides ####
     lineCollections = CategorizeLines(lines)
 
@@ -268,6 +285,23 @@ def GetAverageLines(image):
     final_four_lines = []
     for lineCollection in lineCollections:
         final_four_lines.append(np.mean(lineCollection, axis=0))
+
+    ### DRAW AVERAGE LINES ON BLACK CANVAS ####
+    canvas =  np.zeros((480, 720, 3), dtype=np.uint8)
+
+    for line in final_four_lines:
+        rho_l, theta_l = line[0]
+        a_l = math.cos(theta_l)
+        b_l = math.sin(theta_l)
+        x0_l = a_l * rho_l
+        y0_l = b_l * rho_l
+        pt1_l = (int(x0_l + 1000*(-b_l)), int(y0_l + 1000*(a_l)))
+        pt2_l = (int(x0_l - 1000*(-b_l)), int(y0_l - 1000*(a_l)))
+        cv2.line(canvas, pt1_l, pt2_l, (255,255,255), 1, cv2.LINE_AA)
+
+    canvas = cv2.cvtColor(canvas, cv2.COLOR_BGR2GRAY)
+    cv2.imshow("Final four lines", canvas)
+    # cv2.waitKey(0)
     
     return final_four_lines
 
@@ -328,16 +362,16 @@ def DrawOnCanvas(intersections, lines):
     #### BLANK CANVAS TO DRAW RESULTS ON ####
     canvas =  np.zeros((480, 720, 3), dtype=np.uint8)
 
-    #### DRAW INTERSECTION POINTS ONTO CANVAS
-    # for point in intersections:
-    #     cv2.circle(canvas, point[0], radius=10, color=(0, 0, 255), thickness=-1)
+    ### DRAW INTERSECTION POINTS ONTO CANVAS
+    for point in intersections:
+        cv2.circle(canvas, point[0], radius=10, color=(0, 255, 255), thickness=-1)
 
     #### DRAW LINES BETWEEN INTERSECTION POINTS #####
     simplified_intersections = [intersections[0][0], intersections[2][0], intersections[3][0], intersections[1][0]]
     simplified_intersections = np.array(simplified_intersections)
     cv2.drawContours(canvas, [simplified_intersections], 0, (255,255,255), 2)
 
-    #### DRAW LINES ON BLACK CANVAS ####
+    ## DRAW LINES ON BLACK CANVAS ####
     # for line in lines:
     #     rho_l, theta_l = line[0]
     #     a_l = math.cos(theta_l)

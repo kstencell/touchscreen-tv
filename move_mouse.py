@@ -52,29 +52,30 @@ def MoveMouse():
         pointX = (xPositionCursor1 + xPositionCursor2)/2
         pointY = (yPositionCursor1 + yPositionCursor2)/2
 
-        print(f"Mouse Thread sees: {globals.points_from_cameras}")
+        # print(f"Mouse Thread sees: {globals.points_from_cameras}")
 
+        # if ((abs(pointX - pyautogui.position()[0]) > 0.1*globals.screensize[0]) or (abs(pointY - pyautogui.position()[1]) > 0.1*globals.screensize[1])):
+        #     continue
         if (globals.points_from_cameras[0][0] != 0 and globals.points_from_cameras[0][1] != 0 and globals.points_from_cameras[1][0] != 0 and globals.points_from_cameras[1][1] != 0):
-            pyautogui.moveTo(pointX, pointY)
+            pyautogui.moveTo(pointX, pointY, 0.1, pyautogui.easeOutQuad)
             print(f"Moved mouse to ({pointX}, {pointY})", flush=True)
-
+            print(f"Recently Clicked: {recentlyClicked}")
             #### CLICKING functionality ####
-            if (abs(xPositionCursor1 - xPositionCursor2) < 0.05*globals.screensize[0] and abs(yPositionCursor1 - yPositionCursor2) < 0.05*globals.screensize[1] and recentlyClicked == False):
+            if (abs(xPositionCursor1 - xPositionCursor2) < 0.02*globals.screensize[0] and abs(yPositionCursor1 - yPositionCursor2) < 0.02*globals.screensize[1] and recentlyClicked == False):
                 pyautogui.click()
                 recentlyClicked = True
                 print("Mouse click")
-            if (abs(xPositionCursor1 - xPositionCursor2) > 0.05*globals.screensize[0] and abs(yPositionCursor1 - yPositionCursor2) > 0.05*globals.screensize[1] and recentlyClicked == True):
+            if (abs(xPositionCursor1 - xPositionCursor2) > 0.02*globals.screensize[0] and abs(yPositionCursor1 - yPositionCursor2) > 0.2*globals.screensize[1] and recentlyClicked == True):
                 recentlyClicked = False
-
         elif (globals.points_from_cameras[0][0] == 0 and globals.points_from_cameras[0][1] == 0 and globals.points_from_cameras[1][0] != 0 and globals.points_from_cameras[1][1] != 0):
-            pyautogui.moveTo(xPositionCursor2, yPositionCursor2)
+            pyautogui.moveTo(xPositionCursor2, yPositionCursor2, 0.2, pyautogui.easeOutQuad)
             print(f"Moved mouse to ({xPositionCursor2}, {yPositionCursor2})", flush=True)
         elif (globals.points_from_cameras[1][0] == 0 and globals.points_from_cameras[1][1] == 0 and globals.points_from_cameras[0][0] != 0 and globals.points_from_cameras[0][1] != 0):
-            pyautogui.moveTo(xPositionCursor1, yPositionCursor1)
+            pyautogui.moveTo(xPositionCursor1, yPositionCursor1, 0.2, pyautogui.easeOutQuad)
             print(f"Moved mouse to ({xPositionCursor1}, {yPositionCursor1})", flush=True)
 
 
-        time.sleep(0.01)
+        time.sleep(0.05)
             
 
         
